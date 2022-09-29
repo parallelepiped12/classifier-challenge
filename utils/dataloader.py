@@ -27,12 +27,19 @@ class CountingDataset(torch.utils.data.IterableDataset):
 def make_torch_image(num_objects, image_size, object_size=1, indices=None):
     image = torch.zeros(1, image_size[0], image_size[1])
     num_object_places = (image_size[0] // object_size) * (image_size[1] // object_size)
+    # Indices can be specified for validation and test datasets, otherwise
+    # they are allocated randomly
     if indices is None:
-        indices = torch.randperm(num_object_places)[:num_objects]
-    for i in indices:
-        idx_h = (i % (image_size[0] // object_size)) * object_size
-        idx_w = (i // (image_size[0] // object_size)) * object_size
-        image[0, idx_h:idx_h+object_size, idx_w:idx_w+object_size] = 1
+        indices = random.sample(range(num_object_places), num_objects)
+    indices = torch.tensor(indices)
+    idx_h = torch.remainder(indices, image_size[0] // object_size) * object_size
+    idx_w = indices.div(image_size[0] // object_size, rounding_mode="floor") * object_size
+    idx = torch.stack([idx_h, idx_w])
+    # this process of looping through the pixels to modify is too slow
+    # the speed makes it infeasible to train models with a lot of classes
+    # i think it could be done faster using scatter
+    for i in range(num_objects):
+        image[0, idx[0, i]:idx[0, i]+object_size, idx[1, i]:idx[1, i]+object_size] = 1
     return image
 
 
