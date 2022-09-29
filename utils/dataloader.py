@@ -56,11 +56,11 @@ class FiniteCountingDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         return make_torch_image(self.num_objects[idx], self.image_size,
-                                self.object_size, self.incides[idx])
+                                self.object_size, self.indices[idx]), self.num_objects[idx]
 
 
 def make_indices(num_objects, num_object_places):
     indices = []
     for n_obj, n_obj_places in zip(num_objects, num_object_places):
         indices.append(torch.randperm(n_obj_places)[:n_obj])
-    return
+    return indices
