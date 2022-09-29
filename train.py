@@ -35,4 +35,5 @@ for epoch in range(num_epochs):
         optimiser.step()
         epoch_loss += loss / batches_per_epoch
         epoch_accuracy += torch.sum(classes == torch.argmax(output, dim=1)) / (batches_per_epoch * batch_size)
+    torch.save(network.state_dict(), f'models/initial/{epoch+1}.pt')
     print(epoch_loss, epoch_accuracy)
