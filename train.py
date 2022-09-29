@@ -14,9 +14,10 @@ batches_per_epoch = 1000 # dataloader is infinite so there are no real epochs
 batch_size = 100
 image_size = [32, 32]
 min_objects = 0
-max_objects = 10
+max_objects = 1296 # this is the max number for a 36x36 image
+model_name = '1296_pixels'
 
-network = networks.LeNet(num_classes=max_objects-min_objects+1)
+network = networks.LeNet(num_classes=max_objects-min_objects+1, image_size=image_size)
 network.train()
 optimiser = torch.optim.SGD(network.parameters(), lr=0.01)
 loss_function = torch.nn.CrossEntropyLoss()
@@ -35,5 +36,5 @@ for epoch in range(num_epochs):
         optimiser.step()
         epoch_loss += loss / batches_per_epoch
         epoch_accuracy += torch.sum(classes == torch.argmax(output, dim=1)) / (batches_per_epoch * batch_size)
-    torch.save(network.state_dict(), f'models/initial/{epoch+1}.pt')
+    torch.save(network.state_dict(), f'models/{model_name}/{epoch+1}.pt')
     print(epoch_loss, epoch_accuracy)
